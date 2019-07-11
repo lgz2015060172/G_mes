@@ -1,0 +1,24 @@
+1：创建maven工程，创建一个web项目
+2：把字符集改成utf-8
+3：在src/main/java下创建包
+4：创建包：beans（实体类，例如邮件实体类，页面分页的实体类），
+common（一些通用的实体类，Jasondata等用于将前端传入的数据封装成JsonData对象），
+controller（控制器，负责页面的跳转）
+dao（用于操作数据库的接口）
+dto（与数据库进行交互的实体对象）
+exception（异常处理类）
+filter（权限处理类）
+interceptor（请求拦截类，主要通过 session中保存到的url 和 请求参数。如果和上次相同，则是重复提交表单 ）
+model（模型类）
+param（）
+service（调用数据库类的类）
+util（工具类）
+5：在/src/main/resources 下创建spring包，创建applicationContext.xml配置文件
+6:在web.xml开启spring的监听，
+7：applicationContext.xml中配置数据库连接信息-->配置druid连接池-->配置sqlsessionfactory-
+->配置一个可以执行批量的sqlSession -->
+8：在spring包下创建spring-servlet.xml->在web.xml中配置Servlet—> 配置拦截器 --> 配置视图解析器 -->配置json解析器 -->默认视图解析器 -->启动注解驱动的spring mvc 功能 --> 启动包扫描功能
+9:在/src/main/resources 下创建db包,创建mybatis配置文件
+10：根据逆向工程的代码生成 与数据库表对应的实体类model与操作数据库的mapper接口，mapper配置文件
+11：测试 spring-mybatis-springmvc
+
