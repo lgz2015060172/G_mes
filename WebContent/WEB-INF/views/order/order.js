@@ -1,48 +1,4 @@
-$(function() {
-	var ids="";
-	$(".batchStart-btn").click(function(){
-		//拿到当前被选中的input-checkbox
-		var checks=$(".batchStart-check:checked");
-		if(checks.length!=null&&checks.length>0){
-			//拿到被选中的订单号
-			//mesorder-id
-			$.each(checks,function(i,check){
-//				console.log($(check).closest("tr").data("id")); h5
-//				console.log($(check).closest("tr").attr("data-id"));
-				var id=$(check).closest("tr").attr("data-id");
-				ids+=id+"&";
-			});
-//			console.log(ids.substr(0,ids.length-1));
-			//拼装ids
-			ids=ids.substr(0,ids.length-1);
-			//发送ajax请求
-			$.ajax({
-				url : "/order/orderBatchStart.json",
-				data : {//左面是数据名称-键，右面是值
-					ids:ids
-				},
-				type : 'POST',
-				success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
-					loadOrderList();
-				}
-			});
-			ids="";//111&122&111&122
-		}
-	});
-
-	$(".batchStart-th").click(function(){
-		var checks=$(".batchStart-check");
-		$.each(checks,function(i,input){
-			//状态反选
-//			console.log($(input).attr("checked"));调试测试
-//			var checked=input.checked;
-//			console.log(i+"--"+checked);
-			//true-false  false-true  使用三目运算符
-			input.checked=input.checked==true?false:true;
-		});
-	});
-///////////////////////////////////////////////////////////////////////////
-			//页面开始加载
+$(function() {//页面开始加载
 			//执行分页逻辑
 			//定义一些全局变量
 			var orderMap = {};//准备一个map格式的仓库，等待存储从后台返回过来的数据
@@ -58,10 +14,10 @@ $(function() {
 			//加载模板内容进入html
 			//01从模板中获取页面布局内容
 			//orderListTemplate就是mustache模板的id值
-			var orderBatchListTemplate = $("#orderBatchListTemplate").html();
+			var orderListTemplate = $("#orderListTemplate").html();
 			//02使用mustache模板加载这串内容
 			//只是把准备好的页面模板拿出来，放在解析引擎中，准备让引擎往里面填充数据（渲染视图）
-			Mustache.parse(orderBatchListTemplate);
+			Mustache.parse(orderListTemplate);
 			//渲染分页列表
 			//调用分页函数
 			loadOrderList();
@@ -109,7 +65,6 @@ $(function() {
 			//渲染所有的mustache模板页面
 			//result中的存储数据，就是一个list<MesOrder>集合,是由service访问数据库后返回给controller的数据模型
 			function renderOrderListAndPage(result, url) {
-				
 				//从数据库返回过来的数据集合result
 				if (result.ret) {
 					//再次初始化查询条件
@@ -119,13 +74,12 @@ $(function() {
 					toTime = $("#toTime").val();
 					search_status = $("#search_status").val();
 					//如果查询到数据库中有符合条件的order列表
-					
 					if (result.data.total > 0) {
 						//为订单赋值--在对orderlisttemplate模板进行数据填充--视图渲染
-//						Mustache.render({"name":"李四","gender":"男"});
-//						Mustache.render(list=new ArrayList<String>(){"a01","a02"},{"name":"list[i].name","gender":list[i].gender});
+//						//Mustache.render({"name":"李四","gender":"男"});
+//						//Mustache.render(list=new ArrayList<String>(){"a01","a02"},{"name":"list[i].name","gender":list[i].gender});
 						var rendered = Mustache.render(
-								orderBatchListTemplate,//<script id="orderListTemplate" type="x-tmpl-mustache">
+										orderListTemplate,//<script id="orderListTemplate" type="x-tmpl-mustache">
 										{
 											"orderList" : result.data.data,//{{#orderList}}--List-(result.data.data-list<MesOrder>)
 											"come_date" : function() {
@@ -160,6 +114,7 @@ $(function() {
 												}
 											}
 										});
+						
 						$.each(result.data.data, function(i, order) {//java-增强for
 							order.orderCometime = new Date(order.orderCometime)
 									.Format("yyyy-MM-dd");
@@ -172,7 +127,7 @@ $(function() {
 					} else {
 						$('#orderList').html('');
 					}
-                   // bindOrderClick();//更新操作
+                    bindOrderClick();//更新操作
 					var pageSize = $("#pageSize").val();
 					var pageNo = $("#orderPage .pageNo").val() || 1;
 					//渲染页码

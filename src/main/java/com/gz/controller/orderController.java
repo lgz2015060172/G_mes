@@ -22,10 +22,15 @@ public class orderController {
 @Resource
 private OrderService orderService;
 private static String FPAth="order/";
+@RequestMapping("/order.page")
+public String orderPage() {
+	return FPAth+"order";
+}
 @RequestMapping("/orderBatch.page")
 public String orderBatch() {
 	return FPAth+"orderBatch";
 }
+//批量增加
 @ResponseBody
 @RequestMapping("/insert.json")
 public JsonData insertAjax(MesOrderVo MesOrderVo) {
@@ -41,11 +46,17 @@ public JsonData updateOrder(MesOrderVo mesOrderVo) {
 
 @RequestMapping("/order.json")
 @ResponseBody
+//分页
 public JsonData searchPage(SearchOrderParam param,PageQuery page) {
-	System.out.println(page);
-	System.out.println(444);
 	PageResult<MesOrder> pr=(PageResult<MesOrder>) orderService.searchPageList(param, page);
 	return JsonData.success(pr);
 }
+//批量启动处理
+	@ResponseBody
+	@RequestMapping("/orderBatchStart.json")
+	public JsonData orderBatchStart(String ids) {
+		orderService.batchStart(ids);
+		return JsonData.success();
+	}
 
 }

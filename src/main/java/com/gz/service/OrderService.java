@@ -34,10 +34,21 @@ public class OrderService {
 	private MesOrderMapper mesOrderMapper;
 	@Resource
 	private SqlSession sqlSession;
-
+    @Resource
+    private PlanService planService;
 	// 一开始就定义一个id生成器
 	private IdGenerator ig = new IdGenerator();
 
+	public void batchStart(String ids) {
+		// 144&143--order(id)
+		if (ids != null && ids.length() > 0) {
+			// 批量处理的sqlSession代理
+			String[] idArray = ids.split("&");
+			mesOrderCustomerMapper.batchStart(idArray);
+			// 批量启动待执行计划
+			planService.startPlansByOrderIds(idArray);
+		}
+	}
 
 	// 修改数据
 	/*public void update(MesOrderVo mesOrderVo) {
@@ -164,7 +175,7 @@ public class OrderService {
 			SearchOrderDto dto = new SearchOrderDto();
 			// copyparam中的值进入dto
 			if (StringUtils.isNotBlank(param.getKeyword())) {
-				dto.setKeyword("%" + param.getKeyword() + "%");
+				dto.setKeyword("%" + param.getKeyword() + "%");//模糊查询
 			}
 			if (StringUtils.isNotBlank(param.getSearch_status())) {
 				dto.setSearch_status(Integer.parseInt(param.getSearch_status()));
@@ -182,7 +193,6 @@ public class OrderService {
 			}
 
 			int count = mesOrderCustomerMapper.countBySearchDto(dto);
-			System.out.println("----------------------------------"+count);
 			if (count > 0) {
 				List<MesOrder> orderList = mesOrderCustomerMapper.getPageListBySearchDto(dto, page);
 				return PageResult.<MesOrder>builder().total(count).data(orderList).build();
