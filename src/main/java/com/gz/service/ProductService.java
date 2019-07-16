@@ -1,0 +1,236 @@
+package com.gz.service;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.session.SqlSession;
+import org.springframework.stereotype.Service;
+
+import com.gz.beans.PageQuery;
+import com.gz.beans.PageResult;
+import com.gz.dao.MesProductCustomerMapper;
+import com.gz.dao.MesProductMapper;
+import com.gz.dto.SearchProductDto;
+import com.gz.exception.SysMineException;
+import com.gz.model.MesProduct;
+import com.gz.param.MesProductVo;
+import com.gz.param.SearchProductParam;
+import com.gz.util.BeanValidator;
+
+
+
+@Service
+public class ProductService {
+	@Resource
+	private MesProductMapper MesProductMapper;
+	@Resource
+	private SqlSession sqlSession;
+	@Resource
+	private MesProductCustomerMapper MesProductCustomerMapper;
+	// 一开始就定义一个id生成器
+	private IdGenerator ig = new IdGenerator();
+
+
+	
+	public void addProduct(MesProductVo mesProductVo) {
+		// 判断一下mesOrder的值是否正确
+		// 后台的数据校验 BeanValidator
+		BeanValidator.check(mesProductVo);// beanvalidator是什么，怎么用
+		try {
+			// 将vo转换为po
+			MesProduct mesProduct = MesProduct.builder().id(mesProductVo.getId()).pId(mesProductVo.getPId()).productId(mesProductVo.getProductId()).productOrderid(mesProductVo.getProductOrderid()).productPlanid(mesProductVo.getProductPlanid()).productTargetweight(mesProductVo.getProductTargetweight()).
+					productRealweight(mesProductVo.getProductRealweight()).productLeftweight(mesProductVo.getProductLeftweight()).productBakweight(mesProductVo.getProductBakweight()).productIrontype(mesProductVo.getProductIrontype()).productIrontypeweight(mesProductVo.getProductIrontypeweight()).productMaterialname(mesProductVo.getProductMaterialname())
+					.productImgid(mesProductVo.getProductImgid()).productMaterialsource(mesProductVo.getProductMaterialsource()).productStatus(mesProductVo.getProductStatus()).productRemark(mesProductVo.getProductRemark()).build();
+
+			// 设置用户的登录信息
+			// TODO
+			mesProduct.setProductOperator("xiaofugui");
+			mesProduct.setProductOperateIp("127.0.0.1");
+			mesProduct.setProductOperateTime(new Date());
+			MesProductMapper.insertSelective(mesProduct);
+			// mesOrderCustomerMapper.addOrder(mesOrder);//数据层交互的数据类型又是po，传入vo是不对的
+		} catch (Exception e) {
+			throw new SysMineException(e + "添加产品出了问题");
+		}
+	}
+
+	public void productBatchInserts(MesProductVo mesProductVo) {
+		// 数据校验
+		BeanValidator.check(mesProductVo);
+		// 先去判断是否是批量添加
+		Integer counts = mesProductVo.getCounts();
+		// 根据counts的个数，生成需要添加的ids的数据集合
+		// zx180001 zx180002
+		List<String> ids = createOrderIdsDefault(Long.valueOf(counts));
+		// sql的批量添加处理
+		MesProductMapper mesProductBatchMapper = sqlSession.getMapper(MesProductMapper.class);
+		for (String orderid : ids) {
+			try {
+				// 将vo转换为po
+				MesProduct mesProduct = MesProduct.builder().id(mesProductVo.getId()).pId(mesProductVo.getPId()).productId(orderid).productOrderid(mesProductVo.getProductOrderid()).productPlanid(mesProductVo.getProductPlanid()).productTargetweight(mesProductVo.getProductTargetweight()).
+				productRealweight(mesProductVo.getProductRealweight()).productLeftweight(mesProductVo.getProductLeftweight()).productBakweight(mesProductVo.getProductBakweight()).productIrontype(mesProductVo.getProductIrontype()).productIrontypeweight(mesProductVo.getProductIrontypeweight()).productMaterialname(mesProductVo.getProductMaterialname())
+				.productImgid(mesProductVo.getProductImgid()).productMaterialsource(mesProductVo.getProductMaterialsource()).productStatus(mesProductVo.getProductStatus()).productRemark(mesProductVo.getProductRemark()).build();
+				// 设置用户的登录信息
+				// TODO
+				mesProduct.setProductOperator("xiaofugui");
+				mesProduct.setProductOperateIp("127.0.0.1");
+				mesProduct.setProductOperateTime(new Date());
+				mesProductBatchMapper.insertSelective(mesProduct);
+			} catch (Exception e) {
+				throw new SysMineException("创建过程有问题");
+			}
+		}
+	}
+
+
+	// 获取数据库所有的数量
+		public Long getProductCount() {
+			return MesProductCustomerMapper.getproductCount();
+		}
+	// 获取id集合
+		public List<String> createOrderIdsDefault(Long ocounts) {
+			if (ig == null) {
+				ig = new IdGenerator();
+			}
+			ig.setCurrentdbidscount(getProductCount());
+			List<String> list = ig.initIds(ocounts);
+			ig.clear();
+			return list;
+		}
+
+		
+		public Object searchPageList(SearchProductParam param, PageQuery page) {
+			// 验证页码是否为空
+			BeanValidator.check(page);
+			// 将param中的字段传入dto进行数据层的交互
+			// 自定义的数据模型，用来与数据库进行交互操作
+			// searchDto 用于分页的where语句后面
+			SearchProductDto dto = new SearchProductDto();
+			// copyparam中的值进入dto
+			if (StringUtils.isNotBlank(param.getKeyword())) {
+				dto.setKeyword("%" + param.getKeyword() + "%");//模糊查询
+			}
+		if(StringUtils.isNotBlank(param.getSearch_source())) {
+			dto.setSearch_source(param.getSearch_source());
+		}
+
+			int count = MesProductCustomerMapper.countBySearchDto(dto);
+			if (count > 0) {
+				List<MesProduct> productList = MesProductCustomerMapper.getPageListBySearchDto(dto, page);
+				return PageResult.<MesProduct>builder().total(count).data(productList).build();
+			}
+
+			return PageResult.<MesProduct>builder().build();
+		}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// 1 默认生成代码
+	// 2 手工生成代码
+	// id生成器
+	class IdGenerator {
+		// 数量起始位置
+		private Long currentdbidscount;
+		private List<String> ids = new ArrayList<String>();
+		private String idpre;
+		private String yearstr;
+		private String idafter;
+
+		public IdGenerator() {
+		}
+
+		public Long getCurrentdbidscount() {
+			return currentdbidscount;
+		}
+
+		public void setCurrentdbidscount(Long currentdbidscount) {
+			this.currentdbidscount = currentdbidscount;
+			if (null == this.ids) {
+				this.ids = new ArrayList<String>();
+			}
+		}
+
+		public List<String> getIds() {
+			return ids;
+		}
+
+		public void setIds(List<String> ids) {
+			this.ids = ids;
+		}
+
+		public String getIdpre() {
+			return idpre;
+		}
+
+		public void setIdpre(String idpre) {
+			this.idpre = idpre;
+		}
+
+		public String getYearstr() {
+			return yearstr;
+		}
+
+		public void setYearstr(String yearstr) {
+			this.yearstr = yearstr;
+		}
+
+		public String getIdafter() {
+			return idafter;
+		}
+
+		public void setIdafter(String idafter) {
+			this.idafter = idafter;
+		}
+
+		public List<String> initIds(Long ocounts) {
+			for (int i = 0; i < ocounts; i++) {
+				this.ids.add(getIdPre() + yearStr() + getIdAfter(i));
+			}
+			return this.ids;
+		}
+
+		//
+		private String getIdAfter(int addcount) {
+			// 系统默认生成5位 ZX1700001
+			int goallength = 5;
+			// 获取数据库order的总数量+1+循环次数(addcount)
+			int count = this.currentdbidscount.intValue() + 1 + addcount;
+			StringBuilder sBuilder = new StringBuilder("");
+			// 计算与5位数的差值
+			int length = goallength - new String(count + "").length();
+			for (int i = 0; i < length; i++) {
+				sBuilder.append("0");
+			}
+			sBuilder.append(count + "");
+			return sBuilder.toString();
+		}
+
+		private String getIdPre() {
+			// idpre==null?this.idpre="ZX":this.idpre=idpre;
+			this.idpre = "gz-f-";
+			return this.idpre;
+		}
+
+		private String yearStr() {
+			Date currentdate = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			String yearstr = sdf.format(currentdate).substring(2, 4);
+			return yearstr;
+		}
+
+		public void clear() {
+			this.ids = null;
+		}
+
+		@Override
+		public String toString() {
+			return "IdGenerator [ids=" + ids + "]";
+		}
+	}
+
+
+}

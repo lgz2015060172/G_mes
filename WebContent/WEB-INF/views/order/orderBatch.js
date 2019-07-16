@@ -6,15 +6,15 @@ $(function() {
 		if(checks.length!=null&&checks.length>0){
 			//拿到被选中的订单号
 			//mesorder-id
-			$.each(checks,function(i,check){
+			$.each(checks,function(i,check){//
 //				console.log($(check).closest("tr").data("id")); h5
 //				console.log($(check).closest("tr").attr("data-id"));
-				var id=$(check).closest("tr").attr("data-id");
-				ids+=id+"&";
+				var id=$(check).closest("tr").attr("data-id");//拿到check的第一个祖先元素“tr”并且设置值为“data_id”
+				ids+=id+"&";//+=会进行雷类型的自动转换。ids=""&""&""
 			});
 //			console.log(ids.substr(0,ids.length-1));
 			//拼装ids
-			ids=ids.substr(0,ids.length-1);
+			ids=ids.substr(0,ids.length-1);//从ids的第0个下标开始，取值到ids.length-1;
 			//发送ajax请求
 			$.ajax({
 				url : "/order/orderBatchStart.json",
@@ -23,7 +23,7 @@ $(function() {
 				},
 				type : 'POST',
 				success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
-					loadOrderList();
+					loadOrderList();//带参数回调
 				}
 			});
 			ids="";//111&122&111&122

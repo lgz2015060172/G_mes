@@ -1,5 +1,7 @@
 package com.gz.param;
 
+import com.gz.param.SearchOrderParam.SearchOrderParamBuilder;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,15 +15,12 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class SearchOrderParam {
+public class SearchProductParam {
+	private String keyword;
 
-    private String keyword;
-
-    private String fromTime;//yyyy-MM-dd HH:mm:ss
-
-    private String toTime;
-    
-    private String search_status;
-    
+    private String search_source;
 	
+    private Integer search_status;
+    
+    private Integer pid;
 }

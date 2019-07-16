@@ -59,8 +59,8 @@
 		  update mes_order set order_status=1
 		  where 
 		  id in
-		  <foreach item="item" index="index" collection="list"
-		      open="(" separator="," close=")">
+		  <foreach item="item" index="index" collection="list" 
+		      open="(" separator="," close=")"> <!--以("  开始，以")结束-->
 		        #{item}
 		  </foreach>
 	</update>
