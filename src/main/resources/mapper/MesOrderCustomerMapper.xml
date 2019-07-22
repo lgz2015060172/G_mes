@@ -38,10 +38,11 @@
 	WHERE
 		oid IS NOT NULL and (oid like 'ZX%' or oid like 'zx%');
 	 -->
-	<select id="countBySearchDto" parameterType="map"
-		resultType="int">
+	<select id="countBySearchDto" parameterType="map"	resultType="int">
 		SELECT count(1)
 		FROM mes_order
+	
+		
 		<include refid="queryConditions" />
 	</select>
     <!-- 以下就是分页版块 -->

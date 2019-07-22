@@ -24,9 +24,7 @@
     <mvc:resources location="/WEB-INF/views/factory/" mapping="/factory/**"/>
     <mvc:resources location="/WEB-INF/views/step/" mapping="/step/**"/>
     <mvc:resources location="/WEB-INF/views/analysis/" mapping="/analysis/**"/>
-    
 
-   
 	<!-- 配置视图解析器 -->
     <bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
 	<!-- 配置json解析器 -->

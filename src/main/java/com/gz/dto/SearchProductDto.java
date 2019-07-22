@@ -1,5 +1,7 @@
 package com.gz.dto;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -7,13 +9,13 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+
 public class SearchProductDto {
 
     private String keyword;
 
     private String search_source;
-    
     private Integer search_status;
-    
+   
     private Integer pid;
 }

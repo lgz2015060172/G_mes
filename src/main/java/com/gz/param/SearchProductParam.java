@@ -1,5 +1,7 @@
 package com.gz.param;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import com.gz.param.SearchOrderParam.SearchOrderParamBuilder;
 
 import lombok.AllArgsConstructor;
@@ -19,7 +21,7 @@ public class SearchProductParam {
 	private String keyword;
 
     private String search_source;
-	
+	@NotBlank
     private Integer search_status;
     
     private Integer pid;

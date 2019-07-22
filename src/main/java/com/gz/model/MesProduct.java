@@ -2,11 +2,12 @@ package com.gz.model;
 
 import java.util.Date;
 
+import com.gz.model.MesPlan.MesPlanBuilder;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
 @ToString
 @Builder
 @AllArgsConstructor
@@ -49,6 +50,8 @@ public class MesProduct {
     private Date productOperateTime;
 
     private String productOperateIp;
+
+    private String luhao;
 
     public Integer getId() {
         return id;
@@ -200,5 +203,13 @@ public class MesProduct {
 
     public void setProductOperateIp(String productOperateIp) {
         this.productOperateIp = productOperateIp == null ? null : productOperateIp.trim();
+    }
+
+    public String getLuhao() {
+        return luhao;
+    }
+
+    public void setLuhao(String luhao) {
+        this.luhao = luhao == null ? null : luhao.trim();
     }
 }

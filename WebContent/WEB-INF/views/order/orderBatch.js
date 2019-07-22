@@ -1,6 +1,7 @@
 $(function() {
 	var ids="";
 	$(".batchStart-btn").click(function(){
+
 		//拿到当前被选中的input-checkbox
 		var checks=$(".batchStart-check:checked");
 		if(checks.length!=null&&checks.length>0){
@@ -17,7 +18,7 @@ $(function() {
 			ids=ids.substr(0,ids.length-1);//从ids的第0个下标开始，取值到ids.length-1;
 			//发送ajax请求
 			$.ajax({
-				url : "/order/orderBatchStart.json",
+				url : "/product/productBatchStart.json",
 				data : {//左面是数据名称-键，右面是值
 					ids:ids
 				},

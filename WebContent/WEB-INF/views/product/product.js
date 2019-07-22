@@ -1,8 +1,50 @@
 $(function() {
+	var ids="";
+	$(".batchStart-btn").click(function(){
+		//拿到当前被选中的input-checkbox
+		var checks=$(".batchStart-check:checked");
+		if(checks.length!=null&&checks.length>0){
+			//拿到被选中的订单号
+			//mesorder-id
+			$.each(checks,function(i,check){//
+//				console.log($(check).closest("tr").data("id")); h5
+//				console.log($(check).closest("tr").attr("data-id"));
+				var id=$(check).closest("tr").attr("data-id");//拿到check的第一个祖先元素“tr”并且设置值为“data_id”
+				ids+=id+"&";//+=会进行雷类型的自动转换。ids=""&""&""
+			});
+//			console.log(ids.substr(0,ids.length-1));
+			//拼装ids
+			ids=ids.substr(0,ids.length-1);//从ids的第0个下标开始，取值到ids.length-1;
+			//发送ajax请求
+			$.ajax({
+				url : "/product/productBatchStart.json",
+				data : {//左面是数据名称-键，右面是值
+					ids:ids
+				},
+				type : 'POST',
+				success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
+					loadProductList();//带参数回调
+				}
+			});
+			ids="";//111&122&111&122
+		}
+	});
+
+	$(".batchStart-th").click(function(){
+		var checks=$(".batchStart-check");
+		$.each(checks,function(i,input){
+			//状态反选
+//			console.log($(input).attr("checked"));调试测试
+//			var checked=input.checked;
+//			console.log(i+"--"+checked);
+			//true-false  false-true  使用三目运算符
+			input.checked=input.checked==true?false:true;
+		});
+	});
 			//页面开始加载
 			//执行分页逻辑
 			//定义一些全局变量
-			var orderMap = {};//准备一个map格式的仓库，等待存储从后台返回过来的数据
+			var productMap = {};//准备一个map格式的仓库，等待存储从后台返回过来的数据
 			var optionStr;//选项参数
 			var pageSize;//页码条数
 			var pageNo;//当前页
@@ -21,24 +63,20 @@ $(function() {
 			Mustache.parse(productListTemplate);
 			//渲染分页列表
 			//调用分页函数
-			loadOrderList();
+			loadProductList();
 			//点击刷新的时候也需要调用分页函数
 			$(".research").click(function(e) {
 				e.preventDefault();
 				$("#productPage .pageNo").val(1);
-				loadOrderList();
+				loadProductList();
 			});
-			//定义调用分页函数，一定是当前的查询条件下（keyword，search_status。。）的分页
-			function loadOrderList(urlnew) {
-				//获取页面当前需要查询的还留在页码上的信息
-				//在当前页中找到需要调用的页码条数
+			function loadProductList(urlnew) {
 				pageSize = $("#pageSize").val();
-				//当前页
 				pageNo = $("#productPage .pageNo").val() || 1;
 				if (urlnew) {
 					url = urlnew;
 				} else {
-					url = "/product/product.json";
+					url = "/product/product.json";   //分页方法的路径
 				}
 				keyword = $("#keyword").val();
 				search_source = $("#search_source").val();
@@ -96,11 +134,20 @@ $(function() {
 										}
 									}
 								});
+						//把页面上的值传到表单中去
+						$.each(result.data.data, function(i, product) {//java-增强for
+							product.productCometime = new Date(product.productCometime)
+									.Format("yyyy-MM-dd");
+							product.productCommittime = new Date(product.productCommittime)
+									.Format("yyyy-MM-dd");
+							productMap[product.id] = product;//result.data.data等同于List<mesOrder>
+						});
 						$('#productList').html(rendered);
 					} else {
 						$('#productList').html('');
 					}
-                  //  bindOrderClick();//更新操作
+					
+                    bindProductClick();//调用跟新
 					var pageSize = $("#pageSize").val();
 					var pageNo = $("#productPage .pageNo").val() || 1;
 					//渲染页码
@@ -110,7 +157,7 @@ $(function() {
 							pageNo,
 							pageSize,
 							result.data.total > 0 ? result.data.data.length : 0,
-							"productPage", loadOrderList);
+							"productPage", loadProductList);
 				} else {
 					showMessage("获取订单列表", result.msg, false);
 				}
@@ -121,14 +168,14 @@ $(function() {
 		function updateProduct(isCreate, successCallbak, failCallbak) {
 			$.ajax({
 				url : isCreate ? "/product/product.json"
-						: "/order/update.json",
+						: "/product/productUpdate.json",
 				data : isCreate ? $("#materialForm").serializeArray() : $(
-						"#orderUpdateForm").serializeArray(),
+						"#productUpdateForm").serializeArray(),
 				type : 'POST',
 				success : function(result) {
 					//数据执行成功返回的消息
 					if (result.ret) {
-	                	loadOrderList(); // 带参数回调
+	                	loadProductList(); // 带参数回调
 						//带参数回调
 						if (successCallbak) {
 							successCallbak(result);
@@ -142,6 +189,56 @@ $(function() {
 				}
 			});
 		}
+		//////////////////////////////////////////////////////////////
+		function bindProductClick(){
+			   $(".product-edit").click(function(e) {
+	            e.preventDefault();
+	            e.stopPropagation();
+	            var productId = $(this).attr("data-id");
+	            $("#dialog-productUpdate-form").dialog({
+	                model: true,
+	                title: "编辑钢材",
+	                open: function(event, ui) {
+	             	    $(".ui-dialog").css("width","600px");
+	                    $(".ui-dialog-titlebar-close", $(this).parent()).hide();
+	                  	//将form表单中的数据清空，使用jquery转dom对象
+	                    $("#productUpdateForm")[0].reset();
+	                  	//拿到map中以键值对，id-plan对象结构的对象,用来向form表单中传递数据
+	                    var targetOrder = productMap[productId];
+	                  	//如果取出这个对象
+	                    if (targetOrder) {
+							/////////////////////////////////////////////////////////////////
+							$("#input-id2").val(targetOrder.id);
+							$("#input-productImgid2").val(targetOrder.productImgid);
+							$("#input-productMaterialname2").val(targetOrder.productMaterialname);
+							$("#input-productMaterialsource2").val(targetOrder.productMaterialsource);
+							$("#input-productTargetweight2").val(targetOrder.productTargetweight);
+							$("#input-productIrontypeweight2").val(targetOrder.productIrontypeweight);
+							$("#input-productIrontype2").val(targetOrder.productIrontype);
+							$("#input-productRemark2").val(targetOrder.productRemark);
+							$("#input-productRealweight2").val(targetOrder.productRealweight);
+							$("#input-productLeftweight2").val(targetOrder.productLeftweight);
+							/////////////////////////////////////////////////////////////////
+	                    }
+	                },
+	                buttons : {
+	                    "更新": function(e) {
+	                        e.preventDefault();
+	                        updateProduct(false, function (data) {
+	                            $("#dialog-productUpdate-form").dialog("close");
+	            				$("#productPage .pageNo").val(1);
+	            				loadProductList();
+	                        }, function (data) {
+	                            showMessage("更新材料", data.msg, false);
+	                        })
+	                    },
+	                    "取消": function (data) {
+	                        $("#dialog-productUpdate-form").dialog("close");
+	                    }
+	                }
+	            });
+	        });
+		   }  
 		//////////////////////////////////////////////////////////////
 			//日期显示
 			$('.datepicker').datepicker({

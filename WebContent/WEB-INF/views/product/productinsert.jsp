@@ -6,7 +6,7 @@
 <%@ include file="/common/backend_common.jsp"%>
 <%@ include file="/common/page.jsp"%>
 <%@ include file="/template/productListTemplate.jsp" %>
-	<script src="productinsert.js"></script> 
+<!-- 	<script src="productinsert.js"></script>  -->
 </head>
 <body class="no-skin" youdao="bind" style="background: white">
 	<input id="gritter-light" checked="" type="checkbox"
@@ -93,6 +93,11 @@
 								<td><label for="counts">批量生成个数</label></td>
 								<td><input id="counts" type="number" name="counts"
 									value="" class="text ui-widget-content ui-corner-all"></td>
+								<td><label for="luhao">炉号</label></td>
+								<td><input id="luhao" type="number" name="luhao"
+									value="" class="text ui-widget-content ui-corner-all"></td>
+							</tr>
+							<tr>
 								<td><label for="submit">生成材料</label></td>
 								<td><input id="addproduct" type="submit" value="点击按钮"
 									class="btn btn-info fa fa-check" /></td>

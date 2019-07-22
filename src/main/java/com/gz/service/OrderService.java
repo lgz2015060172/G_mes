@@ -43,7 +43,7 @@ public class OrderService {
 		// 144&143--order(id)
 		if (ids != null && ids.length() > 0) {
 			// 批量处理的sqlSession代理
-			String[] idArray = ids.split("&");
+			String[] idArray = ids.split("&");//将字符串用&分割返回一个数组
 			mesOrderCustomerMapper.batchStart(idArray);
 			// 批量启动待执行计划
 			planService.startPlansByOrderIds(idArray);

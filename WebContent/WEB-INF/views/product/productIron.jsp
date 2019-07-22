@@ -9,7 +9,7 @@
 <%@ include file="/common/backend_common.jsp" %>
 <%@ include file="/common/page.jsp" %>
 <%@ include file="/template/productListTemplate.jsp" %>
-<script src="product.js"></script> 
+<script src="productIron.js"></script> 
 </head>
 <body class="no-skin" youdao="bind" style="background: white">
 	<input id="gritter-light" checked="" type="checkbox"
@@ -17,7 +17,7 @@
 	<div class="page-header">
 		<h1>
 			材料管理 <small><i class="ace-icon fa fa-angle-double-right"></i>
-				批量到库 </small>
+				钢锭查询 </small>
 		</h1>
 	</div>
 	<div class="main-content-inner">
@@ -43,26 +43,16 @@
 										class="form-control input-sm" placeholder="关键词"
 										aria-controls="dynamic-table">
 									<input type="hidden" name="search_status" value="0"/>
-									<!-- 
-									<label>
-										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;是否有效<select
-										id="search_status" name="search_status"
-										aria-controls="dynamic-table" class="form-control input-sm">
-											<option value="0">未到库</option>
-											<option value="1">已到库</option>
-									</select>
-									</label>
-									-->
+								
 									 <input type="hidden" id="search_status" name="search_status" value="0"/>
  									 <label>
-										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;材料来源 <select
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;是否有效 <select
 										id="search_source" name="search_source"
 										aria-controls="dynamic-table" class="form-control input-sm">
 											<option value=""></option>
-											<option value="钢材">钢材</option>
-											<option value="废料">废料</option>
-											<option value="外购件">外购件</option>
-											<option value="外协件">外协件</option>
+											<option value="到库">到库</option>
+											<option value="未到库">未到库</option>
+											
 									</select>
 									</label> 
 									&nbsp;&nbsp;&nbsp;&nbsp;
@@ -72,10 +62,10 @@
 							</div>
 						<div class="row">
 							<div class="col-xs-12">
-								<div class="dataTables_length" id="dynamic-table_length">
+							<!-- 	<div class="dataTables_length" id="dynamic-table_length">
 									<button class="btn btn-info fa fa-check batchStart-btn"
 										style="margin-bottom: 6px;" type="button">批量到库</button>
-								</div>
+								</div> -->
 							</div>
 						</div>
 						<table id="dynamic-table"
@@ -125,6 +115,6 @@
 			</div>
 		</div>
 	</div>
-	<%@ include file="productUpdateForm.jsp" %>
+		<%@ include file="productUpdateForm.jsp" %>
 </body>
 </html>
